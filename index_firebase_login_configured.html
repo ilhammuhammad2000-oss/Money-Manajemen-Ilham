@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#142235"><title>Money Manager</title>
+<style>
+:root{--bg:#0b1421;--panel:#142337;--panel2:#1b3049;--line:#2a405a;--txt:#f1f6fc;--muted:#a2b3c8;--green:#4be0a7;--red:#ff7885;--blue:#8ab8ff;--gold:#ffd27d}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#12243a,#09111c 65%);color:var(--txt);font:15px system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:1050px;margin:auto;padding:20px 14px 45px}.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}.logo{font-weight:900;font-size:23px;letter-spacing:.5px}.logo span{color:var(--green)}.muted,small{color:var(--muted)}.sub{font-size:12px;color:var(--muted)}button{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px 13px;font-weight:650;cursor:pointer}button.primary{background:var(--green);color:#052117;border-color:var(--green)}button.danger{color:var(--red)}button.sm{padding:6px 9px;font-size:12px}.filter{display:flex;gap:9px;align-items:end;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);padding:12px;border-radius:14px;margin-bottom:14px}.field{min-width:130px;flex:1}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.field input,.field select{width:100%;padding:10px;background:#0b1726;border:1px solid var(--line);border-radius:9px;color:var(--txt);font-size:14px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.card,.panel{background:rgba(20,35,55,.96);border:1px solid var(--line);border-radius:15px;padding:15px}.card label{font-size:12px;color:var(--muted);display:block;margin-bottom:7px}.num{font-size:clamp(16px,3vw,23px);font-weight:850;overflow-wrap:anywhere}.green{color:var(--green)}.red{color:var(--red)}.tabs{display:flex;gap:7px;overflow:auto;margin:13px 0}.tab{white-space:nowrap}.tab.active{background:var(--green);color:#052117;border-color:var(--green)}.panel h2{font-size:17px;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.view.hidden{display:none}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:690px}th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--muted);font-weight:600}.badge{font-size:11px;padding:4px 8px;border-radius:20px;background:#263c57}.income{color:var(--green)}.expense{color:var(--red)}.empty{text-align:center;padding:28px 10px;color:var(--muted)}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bar{height:9px;background:#26394f;border-radius:20px;overflow:hidden;margin-top:7px}.bar i{display:block;height:100%;background:var(--green)}.note{font-size:12px;line-height:1.5;color:var(--muted);margin-top:12px}.modalback{display:none;position:fixed;inset:0;background:#000a;z-index:4;align-items:center;justify-content:center;padding:14px}.modalback.show{display:flex}.modal{width:min(600px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:17px}.modalhead{display:flex;justify-content:space-between;align-items:center}
+@media(max-width:650px){.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}.twocol{grid-template-columns:1fr}.wrap{padding:14px 11px 35px}}@media(max-width:380px){.grid{grid-template-columns:1fr}}
+
+.auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px;background:linear-gradient(145deg,#12243a,#09111c 65%)}
+.auth-card{width:min(440px,100%);background:rgba(20,35,55,.98);border:1px solid var(--line);border-radius:18px;padding:24px}
+.auth-card h1{margin:0 0 7px;font-size:25px}.auth-card p{color:var(--muted);font-size:13px;line-height:1.5}
+.auth-field{margin:13px 0}.auth-field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+.auth-field input{width:100%;padding:12px;background:#0b1726;border:1px solid var(--line);border-radius:9px;color:var(--txt);font-size:15px}
+.auth-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}.auth-actions button{flex:1}
+.auth-message{font-size:13px;line-height:1.5;margin-top:12px;color:var(--gold);min-height:18px}
+.auth-switch{display:flex;gap:8px;margin:14px 0}.auth-switch button{flex:1}
+.auth-switch button.active{background:var(--green);color:#052117;border-color:var(--green)}
+.account-strip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.account-strip small{overflow-wrap:anywhere}
+</style></head><body>
+<div class="auth-screen" id="authScreen">
+ <section class="auth-card">
+  <div class="logo">MONEY<span>MANAGER</span></div><h1 id="authHeading">Masuk ke akun</h1>
+  <p>Kelola penghasilan, pengeluaran, dan kebutuhanmu.</p>
+  <div class="auth-switch"><button type="button" id="loginTab" class="active">Login</button><button type="button" id="signupTab">Buat akun</button></div>
+  <form id="authForm">
+   <div class="auth-field"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="nama@email.com" required></div>
+   <div class="auth-field"><label for="authPassword">Password (minimal 6 karakter)</label><input id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="Masukkan password" required></div>
+   <div class="auth-actions"><button class="primary" id="authSubmit" type="submit">Login</button></div>
+  </form>
+  <button type="button" id="resetPassword" class="sm" style="margin-top:12px">Lupa password?</button>
+  <div class="auth-message" id="authMessage" role="status"></div>
+ </section>
+</div>
+<div class="wrap" id="appShell" style="display:none">
+<header class="top"><div><div class="logo">MONEY<span>MANAGER</span></div><div class="sub">Pengelola penghasilan, pengeluaran & kebutuhan</div><div class="account-strip"><small id="signedInEmail"></small><button id="logoutBtn" type="button" class="sm">Keluar</button></div></div><button id="export">Ekspor data</button></header>
+<div class="filter"><div class="field"><label>Tahun</label><select id="year"></select></div><div class="field"><label>Bulan</label><select id="month"><option value="all">Semua bulan</option></select></div><button id="thisMonth">Bulan ini</button></div>
+<section class="cards">
+<div class="card"><label>Total penghasilan</label><div class="num green" id="incomeTotal">Rp0</div></div>
+<div class="card"><label>Total pengeluaran</label><div class="num red" id="expenseTotal">Rp0</div></div>
+<div class="card"><label>Sisa uang / saldo bersih</label><div class="num" id="balance">Rp0</div></div>
+<div class="card"><label>Jumlah transaksi</label><div class="num" id="count">0</div></div>
+</section>
+<div class="tabs"><button class="tab active" data-tab="summary">Ringkasan</button><button class="tab" data-tab="add">+ Catat transaksi</button><button class="tab" data-tab="records">Daftar transaksi</button><button class="tab" data-tab="needs">Rekap kebutuhan</button></div>
+<section class="panel view" id="summary"><h2>Ringkasan keuangan</h2><div class="twocol"><div><div class="muted">Penghasilan</div><div class="num green" id="sumIn">Rp0</div><div class="bar"><i id="inBar" style="width:0%"></i></div></div><div><div class="muted">Pengeluaran</div><div class="num red" id="sumOut">Rp0</div><div class="bar"><i id="outBar" style="width:0%;background:var(--red)"></i></div></div></div><div class="section"><h2 style="margin-top:20px">Pengeluaran per kategori</h2><div id="categorySummary" class="empty">Belum ada pengeluaran.</div></div></section>
+<section class="panel view hidden" id="add"><h2>Catat penghasilan / pengeluaran</h2><form id="form"><div class="grid">
+<div class="field"><label>Jenis transaksi</label><select id="type"><option value="income">Penghasilan</option><option value="expense">Pengeluaran</option></select></div>
+<div class="field"><label>Tanggal</label><input id="date" type="date" required></div>
+<div class="field"><label>Jumlah (Rp)</label><input id="amount" type="number" min="1" step="1" placeholder="Contoh: 150000" required></div>
+<div class="field"><label>Kategori</label><select id="category"></select></div>
+<div class="field"><label>Jenis kebutuhan</label><select id="kind"><option value="Kebutuhan">Kebutuhan</option><option value="Keinginan">Keinginan</option><option value="Tabungan/Investasi">Tabungan / Investasi</option><option value="Lainnya">Lainnya</option></select></div>
+<div class="field"><label>Nama / keterangan</label><input id="description" placeholder="Contoh: belanja bulanan" required></div>
+</div><div class="actions"><button class="primary" type="submit">Simpan transaksi</button><button type="reset">Kosongkan</button></div></form><p class="note">Gunakan kategori untuk memisahkan kebutuhan rumah tangga, transportasi, makan, tagihan, kesehatan, pendidikan, hiburan, tabungan, dan lainnya.</p></section>
+<section class="panel view hidden" id="records"><h2>Daftar transaksi</h2><div class="tablewrap"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th>Kategori</th><th>Kelompok</th><th>Jumlah</th><th></th></tr></thead><tbody id="rows"></tbody></table></div><div class="empty" id="noRows">Belum ada transaksi pada periode ini.</div></section>
+<section class="panel view hidden" id="needs"><h2>Rekap keperluan & kebutuhan</h2><div id="needsSummary" class="empty">Belum ada data pengeluaran.</div><p class="note">Rekap mengikuti filter bulan dan tahun di bagian atas.</p></section>
+<p class="note">Data disimpan di browser pada perangkat ini. Ekspor data secara berkala untuk cadangan. Saldo bersih di halaman ini adalah total penghasilan dikurangi total pengeluaran yang tercatat dalam periode terpilih.</p>
+</div>
+<div class="modalback" id="modal"><div class="modal"><div class="modalhead"><h2>Edit transaksi</h2><button id="close">Tutup</button></div><div id="editBody"></div></div></div>
+<script>
+const KEY='money_manager_v1';let data=JSON.parse(localStorage.getItem(KEY)||'[]');const $=x=>document.getElementById(x),fmt=n=>'Rp'+Math.round(n||0).toLocaleString('id-ID'),today=new Date(),pad=n=>String(n).padStart(2,'0'),todayStr=`${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+const cats={income:['Gaji','Usaha','Bonus','Investasi','Pendapatan lain'],expense:['Makanan','Belanja rumah tangga','Transportasi','Tagihan','Kesehatan','Pendidikan','Cicilan / utang','Komunikasi','Hiburan','Sosial / keluarga','Tabungan','Investasi','Lainnya']};
+function persist(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function initFilters(){let y=today.getFullYear();for(let i=y-5;i<=y+2;i++)$('year').add(new Option(i,i));$('year').value=y;for(let i=1;i<=12;i++)$('month').add(new Option(new Date(2000,i-1).toLocaleString('id-ID',{month:'long'}),i));$('month').value=today.getMonth()+1;$('date').value=todayStr;fillCats()}
+function fillCats(){let list=cats[$('type').value];$('category').innerHTML=list.map(x=>`<option>${x}</option>`).join('')}
+$('type').onchange=fillCats;
+function filtered(){let y=+$('year').value,m=$('month').value;return data.filter(x=>{let d=new Date(x.date+'T12:00:00');return d.getFullYear()===y&&(m==='all'||d.getMonth()+1===+m)}).sort((a,b)=>b.date.localeCompare(a.date))}
+function render(){let d=filtered(),inc=d.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0),out=d.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0),bal=inc-out;$('incomeTotal').textContent=fmt(inc);$('expenseTotal').textContent=fmt(out);$('balance').textContent=fmt(bal);$('balance').className='num '+(bal>=0?'green':'red');$('count').textContent=d.length;$('sumIn').textContent=fmt(inc);$('sumOut').textContent=fmt(out);let max=Math.max(inc,out,1);$('inBar').style.width=inc/max*100+'%';$('outBar').style.width=out/max*100+'%';
+let expenses=d.filter(x=>x.type==='expense'),by={};expenses.forEach(x=>by[x.category]=(by[x.category]||0)+x.amount);let entries=Object.entries(by).sort((a,b)=>b[1]-a[1]);$('categorySummary').innerHTML=entries.length?entries.map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)"><span>${esc(k)}</span><b>${fmt(v)}</b></div>`).join(''):'Belum ada pengeluaran.';
+$('rows').innerHTML=d.map(x=>`<tr><td>${x.date}</td><td class="${x.type==='income'?'income':'expense'}">${x.type==='income'?'Masuk':'Keluar'}</td><td><b>${esc(x.description)}</b></td><td>${esc(x.category)}</td><td>${esc(x.kind)}</td><td class="${x.type==='income'?'income':'expense'}">${x.type==='income'?'+':'−'}${fmt(x.amount)}</td><td><button class="sm" onclick="edit('${x.id}')">Edit</button> <button class="sm danger" onclick="del('${x.id}')">Hapus</button></td></tr>`).join('');$('noRows').classList.toggle('hidden',d.length>0);
+let kinds={};expenses.forEach(x=>kinds[x.kind]=(kinds[x.kind]||0)+x.amount);let total=Object.values(kinds).reduce((a,b)=>a+b,0);$('needsSummary').innerHTML=total?Object.entries(kinds).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div style="margin:12px 0"><div style="display:flex;justify-content:space-between"><b>${esc(k)}</b><b>${fmt(v)}</b></div><div class="bar"><i style="width:${v/total*100}%"></i></div><small>${(v/total*100).toFixed(1)}% dari pengeluaran</small></div>`).join(''):'Belum ada data pengeluaran.'}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>show(b.dataset.tab));function show(id){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('hidden',v.id!==id))}
+$('form').onsubmit=e=>{e.preventDefault();data.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),type:$('type').value,date:$('date').value,amount:Number($('amount').value),category:$('category').value,kind:$('kind').value,description:$('description').value.trim()});persist();e.target.reset();$('date').value=todayStr;fillCats();show('records')};
+window.del=id=>{if(confirm('Hapus transaksi ini?')){data=data.filter(x=>x.id!==id);persist()}};
+window.edit=id=>{let x=data.find(a=>a.id===id);$('editBody').innerHTML=`<form id="editForm"><div class="grid"><div class="field"><label>Jenis</label><select id="et"><option value="income">Penghasilan</option><option value="expense">Pengeluaran</option></select></div><div class="field"><label>Tanggal</label><input id="ed" type="date" value="${x.date}"></div><div class="field"><label>Jumlah</label><input id="ea" type="number" min="1" value="${x.amount}"></div><div class="field"><label>Kategori</label><input id="ec" value="${esc(x.category)}"></div><div class="field"><label>Kelompok</label><select id="ek">${['Kebutuhan','Keinginan','Tabungan/Investasi','Lainnya'].map(k=>`<option ${x.kind===k?'selected':''}>${k}</option>`).join('')}</select></div><div class="field"><label>Keterangan</label><input id="edesc" value="${esc(x.description)}"></div></div><div class="actions"><button class="primary">Simpan perubahan</button></div></form>`;$('et').value=x.type;$('modal').classList.add('show');$('editForm').onsubmit=e=>{e.preventDefault();Object.assign(x,{type:$('et').value,date:$('ed').value,amount:Number($('ea').value),category:$('ec').value,kind:$('ek').value,description:$('edesc').value});persist();$('modal').classList.remove('show')}}
+$('close').onclick=()=>$('modal').classList.remove('show');$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').classList.remove('show')};$('year').onchange=render;$('month').onchange=render;$('thisMonth').onclick=()=>{$('year').value=today.getFullYear();$('month').value=today.getMonth()+1;render()};
+$('export').onclick=()=>{let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup-money-manager.json';a.click();URL.revokeObjectURL(a.href)};
+initFilters();render();
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+// Ganti dengan konfigurasi dari Firebase Console > Project settings > Your apps.
+const firebaseConfig = {
+  apiKey: "AIzaSyD_fmnvSf3KDrYWXRNJ9FPyHmSXZYR8C8U",
+  authDomain: "money-manager-feaaa.firebaseapp.com",
+  projectId: "money-manager-feaaa",
+  storageBucket: "money-manager-feaaa.firebasestorage.app",
+  messagingSenderId: "736330435311",
+  appId: "1:736330435311:web:5f6f57dec92dbaa2b0a91a",
+  measurementId: "G-RV4CBZ1JXE"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const $auth = id => document.getElementById(id);
+let mode = "login";
+
+function setMode(next) {
+ mode = next;
+ const signup = mode === "signup";
+ $auth("authHeading").textContent = signup ? "Buat akun baru" : "Masuk ke akun";
+ $auth("authSubmit").textContent = signup ? "Daftar" : "Login";
+ $auth("authPassword").autocomplete = signup ? "new-password" : "current-password";
+ $auth("loginTab").classList.toggle("active", !signup);
+ $auth("signupTab").classList.toggle("active", signup);
+ $auth("authMessage").textContent = "";
+}
+function errorText(e) {
+ const m = {
+  "auth/email-already-in-use":"Email sudah terdaftar. Silakan login.",
+  "auth/invalid-email":"Format email belum benar.",
+  "auth/weak-password":"Password terlalu lemah. Gunakan minimal 6 karakter.",
+  "auth/invalid-credential":"Email atau password salah.",
+  "auth/user-not-found":"Akun tidak ditemukan. Silakan daftar.",
+  "auth/too-many-requests":"Terlalu banyak percobaan. Coba lagi nanti.",
+  "auth/network-request-failed":"Koneksi internet bermasalah.",
+  "auth/operation-not-allowed":"Aktifkan Email/Password di Firebase Authentication."
+ };
+ return m[e.code] || "Terjadi kendala: " + (e.message || e.code);
+}
+$auth("loginTab").addEventListener("click", () => setMode("login"));
+$auth("signupTab").addEventListener("click", () => setMode("signup"));
+$auth("authForm").addEventListener("submit", async e => {
+ e.preventDefault();
+ const email = $auth("authEmail").value.trim();
+ const password = $auth("authPassword").value;
+ const btn = $auth("authSubmit");
+ btn.disabled = true; $auth("authMessage").textContent = "Sedang diproses…";
+ try {
+  if (mode === "signup") await createUserWithEmailAndPassword(auth, email, password);
+  else await signInWithEmailAndPassword(auth, email, password);
+  $auth("authMessage").textContent = mode === "signup" ? "Akun dibuat." : "Login berhasil.";
+ } catch (err) { $auth("authMessage").textContent = errorText(err); }
+ finally { btn.disabled = false; }
+});
+$auth("resetPassword").addEventListener("click", async () => {
+ const email = $auth("authEmail").value.trim();
+ if (!email) { $auth("authMessage").textContent = "Masukkan email terlebih dahulu."; $auth("authEmail").focus(); return; }
+ try { await sendPasswordResetEmail(auth, email); $auth("authMessage").textContent = "Jika email terdaftar, tautan reset password sudah dikirim."; }
+ catch (e) { $auth("authMessage").textContent = errorText(e); }
+});
+$auth("logoutBtn").addEventListener("click", async () => { try { await signOut(auth); } catch(e) { alert(errorText(e)); } });
+onAuthStateChanged(auth, user => {
+ $auth("authScreen").style.display = user ? "none" : "flex";
+ $auth("appShell").style.display = user ? "" : "none";
+ $auth("signedInEmail").textContent = user ? (user.email || "Akun masuk") : "";
+});
+</script>
+</body></html>
